@@ -1,4 +1,7 @@
 package pl.kufieta.reserveit_api.facilities.repository;
 
-public class FacilityRepository {
+import org.springframework.data.jpa.repository.JpaRepository;
+import pl.kufieta.reserveit_api.facilities.entity.Facility;
+
+public interface FacilityRepository extends JpaRepository<Facility,Long> {
 }
