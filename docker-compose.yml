@@ -1,0 +1,15 @@
+services:
+  db:
+    image: postgres:16
+    container_name: reserveit-db
+    environment:
+      POSTGRES_DB: reserveit
+      POSTGRES_USER: reserveit
+      POSTGRES_PASSWORD: reserveit
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
