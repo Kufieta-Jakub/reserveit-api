@@ -1,6 +1,7 @@
 package pl.kufieta.reserveit_api.security;
 
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 
@@ -35,6 +36,13 @@ public class JwtService {
                 .expiration(Date.from(now.plus(expirationMinutes, ChronoUnit.MINUTES)))
                 .signWith(secretKey)
                 .compact();
+    }
+    public Claims parseToken(String token) {
+        return Jwts.parser()
+                .verifyWith(secretKey)
+                .build()
+                .parseClaimsJws(token)
+                .getPayload();
     }
 
 }
