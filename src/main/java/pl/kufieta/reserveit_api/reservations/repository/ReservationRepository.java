@@ -1,7 +1,21 @@
 package pl.kufieta.reserveit_api.reservations.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import pl.kufieta.reserveit_api.reservations.entity.Reservation;
 
+import java.time.LocalDateTime;
+
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
+    @Query("""
+            SELECT COUNT(r) FROM Reservation r
+            WHERE r.facility.id = :facilityId
+              AND r.status <> pl.kufieta.reserveit_api.reservations.entity.ReservationStatus.CANCELLED
+              AND r.startTime < :endTime
+              AND r.endTime > :startTime
+            """)
+    long countOverlapping(@Param("facilityId") Long facilityId,
+                          @Param("startTime") LocalDateTime startTime,
+                          @Param("endTime") LocalDateTime endTime);
 }
