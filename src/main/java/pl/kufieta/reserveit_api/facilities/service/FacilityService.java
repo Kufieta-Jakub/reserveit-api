@@ -5,7 +5,7 @@ import org.springframework.transaction.annotation.Transactional;
 import pl.kufieta.reserveit_api.facilities.dto.FacilityRequest;
 import pl.kufieta.reserveit_api.facilities.dto.FacilityResponse;
 import pl.kufieta.reserveit_api.facilities.entity.Facility;
-import pl.kufieta.reserveit_api.facilities.controller.repository.FacilityRepository;
+import pl.kufieta.reserveit_api.facilities.repository.FacilityRepository;
 import java.util.List;
 
 @Service
