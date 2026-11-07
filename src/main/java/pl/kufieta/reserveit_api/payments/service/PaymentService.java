@@ -1,9 +1,11 @@
 package pl.kufieta.reserveit_api.payments.service;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.kufieta.reserveit_api.common.ConflictException;
 import pl.kufieta.reserveit_api.common.NotFoundException;
+import pl.kufieta.reserveit_api.notifications.ReservationConfirmedEvent;
 import pl.kufieta.reserveit_api.payments.dto.PaymentInfo;
 import pl.kufieta.reserveit_api.payments.dto.PaymentWebhookRequest;
 import pl.kufieta.reserveit_api.payments.entity.Payment;
@@ -21,10 +23,12 @@ public class PaymentService {
 
     private final PaymentRepository paymentRepository;
     private final PaymentProvider paymentProvider;
+    private final ApplicationEventPublisher eventPublisher;
 
-    public PaymentService(PaymentRepository paymentRepository, PaymentProvider paymentProvider) {
+    public PaymentService(PaymentRepository paymentRepository, PaymentProvider paymentProvider, ApplicationEventPublisher eventPublisher) {
         this.paymentRepository = paymentRepository;
         this.paymentProvider = paymentProvider;
+        this.eventPublisher = eventPublisher;
     }
 
     @Transactional
@@ -52,6 +56,13 @@ public class PaymentService {
                 }
                 payment.markPaid();
                 reservation.confirm();
+                eventPublisher.publishEvent(new ReservationConfirmedEvent(
+                        reservation.getUser().getEmail(),
+                        reservation.getFacility().getName(),
+                        reservation.getStartTime(),
+                        reservation.getEndTime(),
+                        payment.getAmount()
+                ));
             }
             case FAILED -> {
                 payment.markFailed();

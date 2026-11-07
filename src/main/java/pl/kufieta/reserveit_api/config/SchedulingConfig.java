@@ -1,4 +1,4 @@
-package pl.kufieta.reserveit_api;
+package pl.kufieta.reserveit_api.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
