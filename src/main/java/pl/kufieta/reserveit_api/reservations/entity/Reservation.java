@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 @Table(name = "reservations")
 @Entity
 public class Reservation {
+    public static final long PAYMENT_TIMEOUT_MINUTES = 15;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -39,13 +40,20 @@ public class Reservation {
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
+    @Column(name = "expires_at")
+    private LocalDateTime expiresAt;
+
     public Reservation(Facility facility, User user, LocalDateTime startTime, LocalDateTime endTime) {
         this.facility = facility;
         this.user = user;
         this.startTime = startTime;
         this.endTime = endTime;
-        this.status = ReservationStatus.CONFIRMED;
+        this.status = ReservationStatus.PENDING;
         this.createdAt = LocalDateTime.now();
+        this.expiresAt = this.createdAt.plusMinutes(PAYMENT_TIMEOUT_MINUTES);
+    }
+    public void confirm() {
+        this.status = ReservationStatus.CONFIRMED;
     }
 
     public void cancel() {

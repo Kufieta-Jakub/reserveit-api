@@ -12,6 +12,7 @@ import org.testcontainers.utility.DockerImageName;
 import pl.kufieta.reserveit_api.common.ConflictException;
 import pl.kufieta.reserveit_api.facilities.entity.Facility;
 import pl.kufieta.reserveit_api.facilities.repository.FacilityRepository;
+import pl.kufieta.reserveit_api.payments.repository.PaymentRepository;
 import pl.kufieta.reserveit_api.reservations.dto.CreateReservationRequest;
 import pl.kufieta.reserveit_api.reservations.repository.ReservationRepository;
 import pl.kufieta.reserveit_api.users.entity.Role;
@@ -45,11 +46,14 @@ class ReservationConcurrencyTest {
     private FacilityRepository facilityRepository;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private PaymentRepository paymentRepository;
 
     private Facility facility;
 
     @BeforeEach
     void setUp() {
+        paymentRepository.deleteAll();
         reservationRepository.deleteAll();
         userRepository.deleteAll();
         facilityRepository.deleteAll();

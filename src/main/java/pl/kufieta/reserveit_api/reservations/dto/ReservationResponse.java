@@ -11,7 +11,8 @@ public record ReservationResponse (
         String facilityName,
         LocalDateTime startTime,
         LocalDateTime endTime,
-        ReservationStatus status
+        ReservationStatus status,
+        LocalDateTime expiresAt
 ) {
     public static ReservationResponse from (Reservation reservation) {
         return new ReservationResponse(
@@ -20,6 +21,7 @@ public record ReservationResponse (
             reservation.getFacility().getName(),
             reservation.getStartTime(),
             reservation.getEndTime(),
-            reservation.getStatus());
+            reservation.getStatus(),
+            reservation.getExpiresAt());
     }
 }

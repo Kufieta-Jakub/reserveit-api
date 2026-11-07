@@ -10,7 +10,12 @@ import pl.kufieta.reserveit_api.common.ConflictException;
 import pl.kufieta.reserveit_api.common.NotFoundException;
 import pl.kufieta.reserveit_api.facilities.repository.FacilityRepository;
 import pl.kufieta.reserveit_api.facilities.entity.Facility;
+import pl.kufieta.reserveit_api.payments.dto.PaymentInfo;
+
+
+import pl.kufieta.reserveit_api.payments.service.PaymentService;
 import pl.kufieta.reserveit_api.reservations.dto.CreateReservationRequest;
+import pl.kufieta.reserveit_api.reservations.dto.ReservationCreatedResponse;
 import pl.kufieta.reserveit_api.reservations.dto.ReservationResponse;
 import pl.kufieta.reserveit_api.reservations.entity.Reservation;
 import pl.kufieta.reserveit_api.reservations.entity.ReservationStatus;
@@ -18,6 +23,9 @@ import pl.kufieta.reserveit_api.reservations.repository.ReservationRepository;
 import pl.kufieta.reserveit_api.users.entity.User;
 import pl.kufieta.reserveit_api.users.repository.UserRepository;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -31,9 +39,11 @@ public class ReservationService {
     private FacilityRepository facilityRepository;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private PaymentService paymentService;
 
     @Transactional
-    public ReservationResponse create(CreateReservationRequest createReservationRequest, String userEmail) {
+    public ReservationCreatedResponse create(CreateReservationRequest createReservationRequest, String userEmail) {
         if(!createReservationRequest.startTime().isBefore(createReservationRequest.endTime())){
             throw  new IllegalArgumentException("start time must be before end time");
         }
@@ -62,12 +72,24 @@ public class ReservationService {
 
         Reservation reservation = new Reservation(
                 facility, user, createReservationRequest.startTime(), createReservationRequest.endTime());
+        Reservation saved;
         try {
-            return ReservationResponse.from(reservationRepository.save(reservation));
+            saved = reservationRepository.saveAndFlush(reservation);
         }catch (DataIntegrityViolationException e){
             throw  new ConflictException("Facility is already booked in this time");
         }
+
+        BigDecimal amount = calculateAmount(facility,createReservationRequest);
+        PaymentInfo payment = paymentService.createForReservation(saved, amount);
+        return new ReservationCreatedResponse(ReservationResponse.from(saved), payment);
     }
+    private BigDecimal calculateAmount(Facility facility, CreateReservationRequest request) {
+        long minutes = Duration.between(request.startTime(), request.endTime()).toMinutes();
+        return facility.getPricePerHour()
+                .multiply(BigDecimal.valueOf(minutes))
+                .divide(BigDecimal.valueOf(60), 2, RoundingMode.HALF_UP);
+    }
+
     @Transactional(readOnly = true)
     public Page<ReservationResponse> findMine(String userEmail, LocalDate from, LocalDate to,
                                               Pageable pageable) {

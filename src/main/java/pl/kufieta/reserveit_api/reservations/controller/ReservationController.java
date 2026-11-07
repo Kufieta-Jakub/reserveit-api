@@ -12,6 +12,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import pl.kufieta.reserveit_api.reservations.dto.CreateReservationRequest;
+import pl.kufieta.reserveit_api.reservations.dto.ReservationCreatedResponse;
 import pl.kufieta.reserveit_api.reservations.dto.ReservationResponse;
 
 import pl.kufieta.reserveit_api.reservations.repository.ReservationRepository;
@@ -32,7 +33,7 @@ public class ReservationController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ReservationResponse create(@Valid @RequestBody CreateReservationRequest createReservationRequest, Authentication authentication) {
+    public ReservationCreatedResponse create(@Valid @RequestBody CreateReservationRequest createReservationRequest, Authentication authentication) {
         return reservationService.create(createReservationRequest,authentication.getName());
     }
 
