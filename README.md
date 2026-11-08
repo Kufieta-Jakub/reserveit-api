@@ -147,4 +147,4 @@ Docker must be running: integration tests start a real PostgreSQL with Testconta
 
 ## Author
 
-Jakub Kufieta, Computer Science student. [GitHub](https://github.com/<your-username>) · [LinkedIn](https://www.linkedin.com/in/<your-profile>)
+Jakub Kufieta, Computer Science student. [GitHub](https://github.com/Kufieta-Jakub>) · [LinkedIn](https://www.linkedin.com/in/kufieta-jakub/>)
